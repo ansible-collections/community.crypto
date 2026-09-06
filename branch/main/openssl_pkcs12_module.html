@@ -22,7 +22,7 @@
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="community.crypto.openssl_privatekey module – Generate OpenSSL private keys" href="openssl_privatekey_module.html" />
+    <link rel="next" title="community.crypto.openssl_pkcs12_extract module – Extract certificate and private key from PKCS#12 archive" href="openssl_pkcs12_extract_module.html" />
     <link rel="prev" title="community.crypto.openssl_dhparam module – Generate OpenSSL Diffie-Hellman Parameters" href="openssl_dhparam_module.html" /><!-- extra head elements for Ansible beyond RTD Sphinx Theme -->
 
 
@@ -118,6 +118,8 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_pkcs12_extract_module.html">community.crypto.openssl_pkcs12_extract module – Extract certificate and private key from PKCS#12 archive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openssl_pkcs12_info_module.html">community.crypto.openssl_pkcs12_info module – Return certificates and (optionally) private key of a PKCS#12 file</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_module.html">community.crypto.openssl_privatekey module – Generate OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_convert_module.html">community.crypto.openssl_privatekey_convert module – Convert OpenSSL private keys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="openssl_privatekey_info_module.html">community.crypto.openssl_privatekey_info module – Provide information for OpenSSL private keys</a></li>
@@ -229,6 +231,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-action" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p><code class="ansible-value docutils literal notranslate"><span class="pre">export</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">parse</span></code> a PKCS#12.</p>
+<p>Note that <code class="ansible-value docutils literal notranslate"><span class="pre">parse</span></code> will be deprecated in the future. Use <a class="reference internal" href="openssl_pkcs12_extract_module.html#ansible-collections-community-crypto-openssl-pkcs12-extract-module"><span class="std std-ref">community.crypto.openssl_pkcs12_extract</span></a> instead.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;export&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -362,7 +365,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-other_certificates" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-aliases">aliases: ca_certificates</span></p>
 <p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=path</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>List of other certificates to include. Pre Ansible 2.8 this parameter was called <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-ca-certificates"><span class="std std-ref"><span class="pre">ca_certificates</span></span></a></strong></code>.</p>
+<td><div class="ansible-option-cell"><p>List of other certificates to include.</p>
 <p>Assumes there is one PEM-encoded certificate per file. If a file contains multiple PEM certificates, set <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-other-certificates-parse-all"><span class="std std-ref"><span class="pre">other_certificates_parse_all</span></span></a></strong></code> to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>.</p>
 <p>Mutually exclusive with <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-pkcs12-module-parameter-other-certificates-content"><span class="std std-ref"><span class="pre">other_certificates_content</span></span></a></strong></code>.</p>
 </div></td>
@@ -597,6 +600,10 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 </dd>
 <dt><a class="reference internal" href="openssl_dhparam_module.html#ansible-collections-community-crypto-openssl-dhparam-module"><span class="std std-ref">community.crypto.openssl_dhparam</span></a></dt><dd><p>Generate OpenSSL Diffie-Hellman Parameters.</p>
 </dd>
+<dt><a class="reference internal" href="openssl_pkcs12_info_module.html#ansible-collections-community-crypto-openssl-pkcs12-info-module"><span class="std std-ref">community.crypto.openssl_pkcs12_info</span></a></dt><dd><p>Return certificates and (optionally) private key of a PKCS#12 file.</p>
+</dd>
+<dt><a class="reference internal" href="openssl_pkcs12_extract_module.html#ansible-collections-community-crypto-openssl-pkcs12-extract-module"><span class="std std-ref">community.crypto.openssl_pkcs12_extract</span></a></dt><dd><p>Extract certificate and private key from PKCS#12 archive.</p>
+</dd>
 <dt><a class="reference internal" href="openssl_privatekey_module.html#ansible-collections-community-crypto-openssl-privatekey-module"><span class="std std-ref">community.crypto.openssl_privatekey</span></a></dt><dd><p>Generate OpenSSL private keys.</p>
 </dd>
 <dt><a class="reference internal" href="openssl_publickey_module.html#ansible-collections-community-crypto-openssl-publickey-module"><span class="std std-ref">community.crypto.openssl_publickey</span></a></dt><dd><p>Generate an OpenSSL public key from its private key.</p>
@@ -752,7 +759,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 
 <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="openssl_dhparam_module.html" class="btn btn-neutral float-left" title="community.crypto.openssl_dhparam module – Generate OpenSSL Diffie-Hellman Parameters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="openssl_privatekey_module.html" class="btn btn-neutral float-right" title="community.crypto.openssl_privatekey module – Generate OpenSSL private keys" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="openssl_pkcs12_extract_module.html" class="btn btn-neutral float-right" title="community.crypto.openssl_pkcs12_extract module – Extract certificate and private key from PKCS#12 archive" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
