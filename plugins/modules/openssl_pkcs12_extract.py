@@ -172,7 +172,6 @@ class PkcsExtract:
         self.module = module
         self.passphrase: str | None = module.params["passphrase"]
         self.path: str | None = module.params["path"]
-        self.return_private_key: bool = module.params["return_private_key"]
         self.backup: bool = module.params["backup"]
 
         self.combined_path: str | None = module.params["combined_path"]
