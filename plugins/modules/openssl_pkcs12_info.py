@@ -180,7 +180,9 @@ class PkcsInfo:
         result: dict[str, t.Any] = {
             "certificate": to_text(cert) if cert else None,
             "other_certificates": [to_text(crt) for crt in other_certs],
-            "friendly_name": to_text(friendly_name) if friendly_name is not None else None,
+            "friendly_name": (
+                to_text(friendly_name) if friendly_name is not None else None
+            ),
         }
         if self.return_private_key:
             result["privatekey"] = to_text(pkey) if pkey else None
