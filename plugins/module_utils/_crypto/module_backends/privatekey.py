@@ -707,6 +707,8 @@ def get_privatekey_argument_spec() -> ArgumentSpec:
                 "type": "str",
                 "choices": ["auto", "cryptography"],
                 "default": "auto",
+                "removed_in_version": "4.0.0",
+                "removed_from_collection": "community.crypto",
             },
             "regenerate": {
                 "type": "str",

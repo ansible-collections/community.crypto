@@ -401,6 +401,8 @@ def get_certificate_argument_spec() -> ArgumentSpec:
                 "type": "str",
                 "default": "auto",
                 "choices": ["auto", "cryptography"],
+                "removed_in_version": "4.0.0",
+                "removed_from_collection": "community.crypto",
             },
             # General properties of a certificate
             "privatekey_path": {"type": "path"},

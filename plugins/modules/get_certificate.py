@@ -76,7 +76,7 @@ options:
       - The default choice is V(auto), which tries to use C(cryptography) if available.
       - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
       - Note that with community.crypto 3.0.0, all values behave the same.
-        This option will be deprecated in a later version.
+        This option is deprecated and will be removed from community.crypto 4.0.0.
         We recommend to not set it explicitly.
     type: str
     default: auto
@@ -335,6 +335,8 @@ def main() -> t.NoReturn:
                 "type": "str",
                 "default": "auto",
                 "choices": ["auto", "cryptography"],
+                "removed_in_version": "4.0.0",
+                "removed_from_collection": "community.crypto",
             },
             "starttls": {"type": "str", "choices": ["mysql"]},
             "ciphers": {"type": "list", "elements": "str"},

@@ -909,6 +909,8 @@ def get_csr_argument_spec() -> ArgumentSpec:
                 "type": "str",
                 "default": "auto",
                 "choices": ["auto", "cryptography"],
+                "removed_in_version": "4.0.0",
+                "removed_from_collection": "community.crypto",
             },
         },
         required_together=[
