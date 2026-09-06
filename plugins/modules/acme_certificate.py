@@ -37,7 +37,6 @@ notes:
   - This module includes basic account management functionality. If you want to have more control over your ACME account,
     use the M(community.crypto.acme_account) module and disable account management for this module using the O(modify_account)
     option.
-  - This module was called C(letsencrypt) before Ansible 2.6. The usage did not change.
 seealso:
   - name: The Let's Encrypt documentation
     description: Documentation for the Let's Encrypt Certification Authority. Provides useful information for example on rate
@@ -144,9 +143,6 @@ options:
       - The value that must be used here will be provided by a previous use of this module. See the examples for more details.
       - Note that for ACME v2, only the C(order_uri) entry of O(data) will be used. For ACME v1, O(data) must be non-empty
         to indicate the second stage is active; all needed data will be taken from the CSR.
-      - 'I(Note): the O(data) option was marked as C(no_log) up to Ansible 2.5. From Ansible 2.6 on, it is no longer marked
-        this way as it causes error messages to be come unusable, and O(data) does not contain any information which can be
-        used without having access to the account key or which are not public anyway.'
     type: dict
   dest:
     description:
@@ -463,7 +459,7 @@ cert_days:
 challenge_data:
   description:
     - Per identifier / challenge type challenge data.
-    - Since Ansible 2.8.5, only challenges which are not yet valid are returned.
+    - Only challenges which are not yet valid are returned.
   returned: changed
   type: dict
   contains:
@@ -534,7 +530,7 @@ challenge_data:
 challenge_data_dns:
   description:
     - List of TXT values per DNS record, in case challenge is V(dns-01) or V(dns-account-01).
-    - Since Ansible 2.8.5, only challenges which are not yet valid are returned.
+    - Only challenges which are not yet valid are returned.
   returned: changed
   type: dict
 authorizations:

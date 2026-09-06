@@ -15,7 +15,6 @@ description:
   - This module only works with the ACME v2 protocol.
 notes:
   - The M(community.crypto.acme_account) module allows to modify, create and delete ACME accounts.
-  - This module was called C(acme_account_facts) before Ansible 2.8. The usage did not change.
 extends_documentation_fragment:
   - community.crypto._acme.basic
   - community.crypto._acme.account
