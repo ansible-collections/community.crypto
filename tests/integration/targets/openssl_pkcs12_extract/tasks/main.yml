@@ -86,8 +86,11 @@
   ansible.builtin.assert:
     that:
       - p12_dumped is changed
+      - p12_dumped.friendly_name == "abracadabra"
       - p12_dumped_idempotency is not changed
+      - p12_dumped_idempotency.friendly_name == "abracadabra"
       - p12_dumped_check_mode is not changed
+      - p12_dumped_check_mode.friendly_name == "abracadabra"
 
 - name: "Read file"
   ansible.builtin.slurp:

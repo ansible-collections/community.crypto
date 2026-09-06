@@ -55,6 +55,14 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
+friendly_name:
+  description:
+    - >-
+      "Friendly name" of the certificate and private key pair.
+    - If no private key is contained in the archive, this has value V(null).
+  returned: success
+  type: str
+  sample: keypair
 certificate:
   description:
     - Certificate associated to the private key in the PKCS#12 archive in PEM format.
