@@ -167,7 +167,7 @@ options:
       - If set to V(cryptography), will try to use the L(cryptography,https://cryptography.io/) library.
       - The value V(pyopenssl) has been removed for community.crypto 3.0.0.
       - Note that with community.crypto 3.0.0, all remaining values behave the same.
-        This option will be deprecated in a later version.
+        This option is deprecated and will be removed from community.crypto 4.0.0.
         We recommend to not set it explicitly.
     type: str
     default: auto
@@ -799,6 +799,8 @@ def main() -> t.NoReturn:
             "type": "str",
             "default": "auto",
             "choices": ["auto", "cryptography"],
+            "removed_in_version": "4.0.0",
+            "removed_from_collection": "community.crypto",
         },
     }
 
