@@ -1,0 +1,200 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Generate private keys
+  community.crypto.openssl_privatekey:
+    path: '{{ remote_tmp_dir }}/ansible_pkey{{ item }}.pem'
+    size: '{{ default_rsa_key_size_certificates }}'
+  loop: "{{ range(1, 4) | list }}"
+
+- name: Read all keys
+  ansible.builtin.slurp:
+    src: '{{ item }}'
+  loop:
+    - "{{ remote_tmp_dir }}/ansible_pkey1.pem"
+    - "{{ remote_tmp_dir }}/ansible_pkey2.pem"
+    - "{{ remote_tmp_dir }}/ansible_pkey3.pem"
+  register: all_keys
+
+- name: Generate CSRs
+  community.crypto.openssl_csr:
+    path: '{{ remote_tmp_dir }}/ansible{{ item }}.csr'
+    privatekey_path: '{{ remote_tmp_dir }}/ansible_pkey{{ item }}.pem'
+    commonName: www{{ item }}.ansible.com
+  loop: "{{ range(1, 4) | list }}"
+
+- name: Generate certificate
+  community.crypto.x509_certificate:
+    path: '{{ remote_tmp_dir }}/ansible{{ item }}.crt'
+    privatekey_path: '{{ remote_tmp_dir }}/ansible_pkey{{ item }}.pem'
+    csr_path: '{{ remote_tmp_dir }}/ansible{{ item }}.csr'
+    provider: selfsigned
+  loop: "{{ range(1, 4) | list }}"
+
+- name: Read all certificates
+  ansible.builtin.slurp:
+    src: '{{ item }}'
+  loop:
+    - "{{ remote_tmp_dir }}/ansible1.crt"
+    - "{{ remote_tmp_dir }}/ansible2.crt"
+    - "{{ remote_tmp_dir }}/ansible3.crt"
+  register: all_certs
+
+- name: Generate concatenated PEM file
+  ansible.builtin.copy:
+    dest: '{{ remote_tmp_dir }}/ansible23.crt'
+    content: '{{ all_certs.results[1].content | b64decode }}{{ all_certs.results[2].content | b64decode }}'
+
+#####################################################################################################################
+
+- name: "Generate PKCS#12 file"
+  community.crypto.openssl_pkcs12:
+    path: '{{ remote_tmp_dir }}/ansible.p12'
+    friendly_name: abracadabra
+    privatekey_path: '{{ remote_tmp_dir }}/ansible_pkey1.pem'
+    certificate_path: '{{ remote_tmp_dir }}/ansible1.crt'
+    state: present
+    mode: '0644'
+
+- name: "Dump PKCS#12 w/o private key"
+  community.crypto.openssl_pkcs12_info:
+    path: '{{ remote_tmp_dir }}/ansible.p12'
+  register: p12_dumped
+
+- name: 'Validate changes'
+  ansible.builtin.assert:
+    that:
+      - p12_dumped is not changed
+      - p12_dumped.certificate is string
+      - p12_dumped.certificate == (all_certs.results[0].content | b64decode)
+      - p12_dumped.other_certificates | length == 0
+      - p12_dumped.friendly_name == "abracadabra"
+      - p12_dumped.privatekey is not defined
+
+- name: "Query PKCS#12 w/ private key"
+  community.crypto.openssl_pkcs12_info:
+    path: '{{ remote_tmp_dir }}/ansible.p12'
+    return_private_key: true
+  register: p12_dumped
+
+- name: 'Validate changes'
+  ansible.builtin.assert:
+    that:
+      - p12_dumped is not changed
+      - p12_dumped.certificate is string
+      - p12_dumped.certificate == (all_certs.results[0].content | b64decode)
+      - p12_dumped.other_certificates | length == 0
+      - p12_dumped.friendly_name == "abracadabra"
+      - p12_dumped.privatekey is string
+      - p12_dumped.privatekey == (all_keys.results[0].content | b64decode)
+
+#####################################################################################################################
+
+- name: "Generate PKCS#12 file without private key"
+  community.crypto.openssl_pkcs12:
+    path: '{{ remote_tmp_dir }}/ansible_no_pkey.p12'
+    friendly_name: abracadabra
+    certificate_path: '{{ remote_tmp_dir }}/ansible1.crt'
+    state: present
+    mode: '0644'
+
+- name: "Query PKCS#12 with no private key"
+  community.crypto.openssl_pkcs12_info:
+    path: '{{ remote_tmp_dir }}/ansible_no_pkey.p12'
+    return_private_key: true
+  register: p12_dumped
+
+- name: 'Validate changes'
+  ansible.builtin.assert:
+    that:
+      - p12_dumped is not changed
+      - p12_dumped.certificate is none
+      - p12_dumped.other_certificates | length == 1
+      - p12_dumped.other_certificates[0] == (all_certs.results[0].content | b64decode)
+      - p12_dumped.friendly_name is none
+      - p12_dumped.privatekey is none
+
+#####################################################################################################################
+
+- name: "Generate PKCS#12 file with multiple certs and passphrase"
+  community.crypto.openssl_pkcs12:
+    path: '{{ remote_tmp_dir }}/ansible_multi_certs.p12'
+    passphrase: hunter3
+    friendly_name: foobar
+    privatekey_path: '{{ remote_tmp_dir }}/ansible_pkey1.pem'
+    certificate_path: '{{ remote_tmp_dir }}/ansible1.crt'
+    other_certificates: '{{ remote_tmp_dir }}/ansible23.crt'
+    other_certificates_parse_all: true
+    state: present
+
+- name: "Query PKCS#12 w/o private key"
+  community.crypto.openssl_pkcs12_info:
+    path: '{{ remote_tmp_dir }}/ansible_multi_certs.p12'
+    passphrase: hunter3
+  register: p12_dumped
+
+- name: 'Validate changes'
+  ansible.builtin.assert:
+    that:
+      - p12_dumped is not changed
+      - p12_dumped.certificate is string
+      - p12_dumped.certificate == (all_certs.results[0].content | b64decode)
+      - p12_dumped.other_certificates | length == 2
+      - p12_dumped.other_certificates[0] == (all_certs.results[1].content | b64decode)
+      - p12_dumped.other_certificates[1] == (all_certs.results[2].content | b64decode)
+      - p12_dumped.friendly_name == "foobar"
+      - p12_dumped.privatekey is not defined
+
+- name: "Query PKCS#12 w/ private key"
+  community.crypto.openssl_pkcs12_info:
+    path: '{{ remote_tmp_dir }}/ansible_multi_certs.p12'
+    passphrase: hunter3
+    return_private_key: true
+  register: p12_dumped
+
+- name: 'Validate changes'
+  ansible.builtin.assert:
+    that:
+      - p12_dumped is not changed
+      - p12_dumped.certificate is string
+      - p12_dumped.certificate == (all_certs.results[0].content | b64decode)
+      - p12_dumped.other_certificates | length == 2
+      - p12_dumped.other_certificates[0] == (all_certs.results[1].content | b64decode)
+      - p12_dumped.other_certificates[1] == (all_certs.results[2].content | b64decode)
+      - p12_dumped.friendly_name == "foobar"
+      - p12_dumped.privatekey is string
+      - p12_dumped.privatekey == (all_keys.results[0].content | b64decode)
+
+#####################################################################################################################
+
+- name: "Generate 'empty' PKCS#12 file"
+  community.crypto.openssl_pkcs12:
+    path: '{{ remote_tmp_dir }}/ansible_empty.p12'
+    friendly_name: abracadabra
+    other_certificates:
+      - '{{ remote_tmp_dir }}/ansible2.crt'
+      - '{{ remote_tmp_dir }}/ansible3.crt'
+    state: present
+
+- name: "Query PKCS#12 w/o private key"
+  community.crypto.openssl_pkcs12_info:
+    path: "{{ remote_tmp_dir }}/ansible_empty.p12"
+  register: p12_dumped
+
+- name: 'Validate changes'
+  ansible.builtin.assert:
+    that:
+      - p12_dumped is not changed
+      - p12_dumped.certificate is none
+      - p12_dumped.other_certificates | length == 2
+      - p12_dumped.other_certificates[0] == (all_certs.results[1].content | b64decode)
+      - p12_dumped.other_certificates[1] == (all_certs.results[2].content | b64decode)
+      - p12_dumped.friendly_name is none
+      - p12_dumped.privatekey is not defined
