@@ -4,6 +4,39 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v3.4.0
+======
+
+Release Summary
+---------------
+
+Feature release with new PKCS#12 modules and some deprecations.
+
+Deprecated Features
+-------------------
+
+- get_certificate - the ``select_crypto_backend`` option is deprecated and will be removed from community.crypto 4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1072).
+- openssl_csr - the ``select_crypto_backend`` option is deprecated and will be removed from community.crypto 4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1072).
+- openssl_csr_info - the ``select_crypto_backend`` option is deprecated and will be removed from community.crypto 4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1072).
+- openssl_csr_pipe - the ``select_crypto_backend`` option is deprecated and will be removed from community.crypto 4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1072).
+- openssl_pkcs12 - the ``select_crypto_backend`` option is deprecated and will be removed from community.crypto 4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1072).
+- openssl_privatekey - the ``select_crypto_backend`` option is deprecated and will be removed from community.crypto 4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1072).
+- openssl_privatekey_info - the ``select_crypto_backend`` option is deprecated and will be removed from community.crypto 4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1072).
+- openssl_privatekey_pipe - the ``select_crypto_backend`` option is deprecated and will be removed from community.crypto 4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1072).
+- openssl_publickey - the ``select_crypto_backend`` option is deprecated and will be removed from community.crypto 4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1072).
+- openssl_publickey_info - the ``select_crypto_backend`` option is deprecated and will be removed from community.crypto 4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1072).
+- openssl_signature - the ``select_crypto_backend`` option is deprecated and will be removed from community.crypto 4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1072).
+- openssl_signature_info - the ``select_crypto_backend`` option is deprecated and will be removed from community.crypto 4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1072).
+- x509_certificate - the ``select_crypto_backend`` option is deprecated and will be removed from community.crypto 4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1072).
+- x509_certificate_info - the ``select_crypto_backend`` option is deprecated and will be removed from community.crypto 4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1072).
+- x509_certificate_pipe - the ``select_crypto_backend`` option is deprecated and will be removed from community.crypto 4.0.0 (https://github.com/ansible-collections/community.crypto/pull/1072).
+
+New Modules
+-----------
+
+- community.crypto.openssl_pkcs12_extract - Extract certificate and private key from PKCS#12 archive.
+- community.crypto.openssl_pkcs12_info - Return certificates and (optionally) private key of a PKCS#12 file.
+
 v3.3.0
 ======
 
