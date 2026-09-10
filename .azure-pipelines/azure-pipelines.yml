@@ -200,10 +200,6 @@ stages:
               test: ansible-test-integration-devel-debian-bookworm-3.11-azp-posix-1
             - name: Debian 12 + py3.11 + group 2
               test: ansible-test-integration-devel-debian-bookworm-3.11-azp-posix-2
-            - name: Debian 11 + py3.9 + group 1
-              test: ansible-test-integration-devel-debian-bullseye-3.9-azp-posix-1
-            - name: Debian 11 + py3.9 + group 2
-              test: ansible-test-integration-devel-debian-bullseye-3.9-azp-posix-2
             - name: Generic + py3.12 + group 1
               test: ansible-test-integration-devel-default-3.12-azp-generic-1
             - name: Generic + py3.12 + group 2
