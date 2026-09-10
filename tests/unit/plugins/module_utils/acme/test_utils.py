@@ -11,7 +11,6 @@ __metaclass__ = type
 import datetime
 
 import pytest
-
 from ansible_collections.community.crypto.plugins.module_utils.acme.backends import (
     CertificateInformation,
 )

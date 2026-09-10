@@ -13,8 +13,6 @@ import re
 
 import cryptography
 import pytest
-from cryptography.x509 import NameAttribute, oid
-
 from ansible_collections.community.crypto.plugins.module_utils.crypto.basic import (
     OpenSSLObjectError,
 )
@@ -27,6 +25,7 @@ from ansible_collections.community.crypto.plugins.module_utils.crypto.cryptograp
 from ansible_collections.community.crypto.plugins.module_utils.version import (
     LooseVersion,
 )
+from cryptography.x509 import NameAttribute, oid
 
 
 @pytest.mark.parametrize(

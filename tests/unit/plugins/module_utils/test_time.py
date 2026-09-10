@@ -13,8 +13,6 @@ import sys
 
 import pytest
 from ansible.module_utils.common.collections import is_sequence
-from freezegun import freeze_time
-
 from ansible_collections.community.crypto.plugins.module_utils.time import (
     UTC,
     add_or_remove_timezone,
@@ -26,6 +24,7 @@ from ansible_collections.community.crypto.plugins.module_utils.time import (
     get_relative_time_option,
     remove_timezone,
 )
+from freezegun import freeze_time
 
 
 TIMEZONES = [
