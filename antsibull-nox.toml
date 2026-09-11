@@ -102,7 +102,6 @@ retry_on_error = "in-ci"
 "azp/posix/vm/" = "extra VMs"
 
 [sessions.ansible_test_integration.nice_docker_names]
-"quay.io/ansible-community/test-image:debian-bullseye" = "Debian 11"
 "quay.io/ansible-community/test-image:debian-bookworm" = "Debian 12"
 "quay.io/ansible-community/test-image:debian-13-trixie" = "Debian 13"
 "quay.io/ansible-community/test-image:archlinux" = "Arch Linux"
@@ -307,12 +306,6 @@ ansible_core = "2.19"
 target = [ "azp/generic/1/", "azp/generic/2/" ]
 docker = [ "default" ]
 python_version = [ "3.8", "3.11", "3.13" ]
-
-[[sessions.ansible_test_integration.groups.sessions]]
-ansible_core = "2.19"
-target = [ "azp/posix/1/", "azp/posix/2/" ]
-python_version = "3.9"
-docker = "quay.io/ansible-community/test-image:debian-bullseye"
 
 [[sessions.ansible_test_integration.groups.sessions]]
 ansible_core = "2.19"
