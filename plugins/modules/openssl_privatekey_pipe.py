@@ -50,7 +50,7 @@ options:
     description:
       - Set to V(true) to return the current private key when the module did not generate a new one.
       - Note that in case of check mode, when this option is not set to V(true), the module always returns the current key
-        (if it was provided) and Ansible will replace it by C(VALUE_SPECIFIED_IN_NO_LOG_PARAMETER).
+        (if it was provided). On ansible-core before 2.22, ansible-core will replace it by C(VALUE_SPECIFIED_IN_NO_LOG_PARAMETER).
     type: bool
     default: false
   regenerate:
@@ -147,6 +147,8 @@ privatekey:
     - Please note that if the result is not changed, the current private key will only be returned if the O(return_current_key)
       option is set to V(true).
     - Will be Base64-encoded if the key is in raw format.
+    - B(Note) on ansible-core 2.22+, this will be registered as a secret.
+      See R(Masking secrets in Ansible output, secret_masking) for more information.
   returned: changed, or O(return_current_key) is V(true)
   type: str
 """
