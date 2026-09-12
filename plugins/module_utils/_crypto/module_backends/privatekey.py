@@ -40,6 +40,9 @@ from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
     assert_required_cryptography_version,
 )
+from ansible_collections.community.crypto.plugins.module_utils._secrets import (
+    mark_as_secret,
+)
 
 if t.TYPE_CHECKING:  # pragma: no cover
     from ansible.module_utils.basic import AnsibleModule
@@ -627,9 +630,11 @@ class PrivateKeyBackend:
             # Store result
             if pk_bytes:
                 if identify_private_key_format(pk_bytes) == "raw":
-                    result["privatekey"] = base64.b64encode(pk_bytes)
+                    result["privatekey"] = mark_as_secret(
+                        base64.b64encode(pk_bytes).decode("utf-8")
+                    )
                 else:
-                    result["privatekey"] = pk_bytes.decode("utf-8")
+                    result["privatekey"] = mark_as_secret(pk_bytes.decode("utf-8"))
             else:
                 result["privatekey"] = None
 
