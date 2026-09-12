@@ -86,6 +86,8 @@ privatekey:
   description:
     - The PKCS#12 archive's private key in PEM format, if present.
     - Only returned if O(return_private_key=true).
+    - B(Note) on ansible-core 2.22+, this will be registered as a secret.
+      See R(Masking secrets in Ansible output, secret_masking) for more information.
   returned: success if O(return_private_key=true)
   type: str
 """
@@ -105,6 +107,9 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptogra
 from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep import (
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
     assert_required_cryptography_version,
+)
+from ansible_collections.community.crypto.plugins.module_utils._secrets import (
+    mark_as_secret,
 )
 
 MINIMAL_CRYPTOGRAPHY_VERSION = COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION
@@ -185,7 +190,7 @@ class PkcsInfo:
             ),
         }
         if self.return_private_key:
-            result["privatekey"] = to_text(pkey) if pkey else None
+            result["privatekey"] = mark_as_secret(to_text(pkey)) if pkey else None
 
         return result
 

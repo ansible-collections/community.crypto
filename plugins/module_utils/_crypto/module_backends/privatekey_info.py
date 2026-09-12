@@ -32,6 +32,9 @@ from ansible_collections.community.crypto.plugins.module_utils._cryptography_dep
     COLLECTION_MINIMUM_CRYPTOGRAPHY_VERSION,
     assert_required_cryptography_version,
 )
+from ansible_collections.community.crypto.plugins.module_utils._secrets import (
+    mark_values_as_secrets,
+)
 
 if t.TYPE_CHECKING:  # pragma: no cover
     from ansible.module_utils.basic import AnsibleModule
@@ -283,7 +286,9 @@ class PrivateKeyInfoRetrieval:
         result["type"] = key_type
         result["public_data"] = key_public_data
         if self.return_private_key_data:
-            result["private_data"] = key_private_data
+            result["private_data"] = mark_values_as_secrets(
+                key_private_data, int_to_string=True
+            )
 
         if self.check_consistency:
             result["key_is_consistent"] = self._is_key_consistent(
