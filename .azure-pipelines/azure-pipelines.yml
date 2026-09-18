@@ -66,6 +66,8 @@ stages:
               test: ansible-test-sanity-2.20
             - name: ansible-core 2.21
               test: ansible-test-sanity-2.21
+            - name: ansible-core 2.22
+              test: ansible-test-sanity-2.22
             - name: ansible-core devel
               test: ansible-test-sanity-devel
             - name: Extra sanity tests
@@ -86,6 +88,8 @@ stages:
               test: ansible-test-units-2.20
             - name: ansible-core 2.21
               test: ansible-test-units-2.21
+            - name: ansible-core 2.22
+              test: ansible-test-units-2.22
             - name: ansible-core devel
               test: ansible-test-units-devel
 
@@ -174,6 +178,36 @@ stages:
               test: ansible-test-integration-2.21-ubuntu2404-azp-posix-1
             - name: Ubuntu 24.04 + group 2
               test: ansible-test-integration-2.21-ubuntu2404-azp-posix-2
+
+  - stage: docker_2_22
+    displayName: Docker 2.22
+    dependsOn: []
+    variables:
+      entryPoint: tests/utils/shippable/nox.sh
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: Alpine 3.24 + group 1
+              test: ansible-test-integration-2.22-alpine324-azp-posix-1
+            - name: Alpine 3.24 + group 2
+              test: ansible-test-integration-2.22-alpine324-azp-posix-2
+            - name: Generic + py3.13 + group 1
+              test: ansible-test-integration-2.22-default-3.13-azp-generic-1
+            - name: Generic + py3.13 + group 2
+              test: ansible-test-integration-2.22-default-3.13-azp-generic-2
+            - name: Generic + py3.15 + group 1
+              test: ansible-test-integration-2.22-default-3.15-azp-generic-1
+            - name: Generic + py3.15 + group 2
+              test: ansible-test-integration-2.22-default-3.15-azp-generic-2
+            - name: Fedora 44 + group 1
+              test: ansible-test-integration-2.22-fedora44-azp-posix-1
+            - name: Fedora 44 + group 2
+              test: ansible-test-integration-2.22-fedora44-azp-posix-2
+            - name: Ubuntu 26.04 + group 1
+              test: ansible-test-integration-2.22-ubuntu2604-azp-posix-1
+            - name: Ubuntu 26.04 + group 2
+              test: ansible-test-integration-2.22-ubuntu2604-azp-posix-2
 
   - stage: docker_devel
     displayName: Docker devel
@@ -279,6 +313,32 @@ stages:
             - name: RHEL 10.1 + group 2
               test: ansible-test-integration-2.21-rhel-10.1-azp-posix-2
 
+  - stage: remote_2_22
+    displayName: Remote 2.22
+    dependsOn: []
+    variables:
+      entryPoint: tests/utils/shippable/nox.sh
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: Fedora 44 + extra VMs
+              test: ansible-test-integration-2.22-fedora-44-azp-posix-vm
+            - name: FreeBSD 15.1 + group 1
+              test: ansible-test-integration-2.22-freebsd-15.1-azp-posix-1
+            - name: FreeBSD 15.1 + group 2
+              test: ansible-test-integration-2.22-freebsd-15.1-azp-posix-2
+            - name: macOS 26.3 + group 1
+              test: ansible-test-integration-2.22-macos-26.3-azp-posix-1
+            - name: macOS 26.3 + group 2
+              test: ansible-test-integration-2.22-macos-26.3-azp-posix-2
+            - name: RHEL 10.2 + group 1
+              test: ansible-test-integration-2.22-rhel-10.2-azp-posix-1
+            - name: RHEL 10.2 + group 2
+              test: ansible-test-integration-2.22-rhel-10.2-azp-posix-2
+            - name: Ubuntu 26.04 + extra VMs
+              test: ansible-test-integration-2.22-ubuntu-26.04-azp-posix-vm
+
   - stage: remote_devel
     displayName: Remote devel
     dependsOn: []
@@ -325,10 +385,12 @@ stages:
       - docker_2_19
       - docker_2_20
       - docker_2_21
+      - docker_2_22
       - docker_devel
       - remote_2_19
       - remote_2_20
       - remote_2_21
+      - remote_2_22
       - remote_devel
     jobs:
       - template: templates/coverage.yml
