@@ -429,7 +429,7 @@ class KeypairBackendCryptography(KeypairBackend):
 
         if self.type == "rsa1":
             self.module.fail_json(
-                msg="rsa1 keys are not supported by the cryptography backend"
+                msg="RSA1 keys are not supported by the cryptography backend"
             )
         if self.type == "mldsa44":
             self.module.fail_json(
