@@ -62,11 +62,13 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
             else "always"
         )
         self.state: t.Literal["present", "absent"] = self.module.params["state"]
-        self.type: t.Literal["rsa", "dsa", "rsa1", "ecdsa", "ed25519"] = (
+        self.type: t.Literal[
+            "rsa", "dsa", "rsa1", "ecdsa", "ed25519", "mldsa44"
+        ] = (
             self.module.params["type"]
         )
 
-        self.size: int = self._get_size(self.module.params["size"])
+        self.size: int | None = self._get_size(self.module.params["size"])
         self._validate_path()
 
         self.original_private_key: PrivateKey | None = None
@@ -74,7 +76,7 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
         self.private_key: PrivateKey | None = None
         self.public_key: PublicKey | None = None
 
-    def _get_size(self, size: int | None) -> int:
+    def _get_size(self, size: int | None) -> int | None:
         if self.type in ("rsa", "rsa1"):
             result = 4096 if size is None else size
             if result < 1024:
@@ -98,8 +100,11 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
                     + "cause this module to fail."
                 )
         elif self.type == "ed25519":
-            # User input is ignored for `key size` when `key type` is ed25519
+            # User input is ignored for fixed-size key types
             result = 256
+        elif self.type == "mldsa44":
+            # User input is ignored for fixed-size key types; ssh-keygen output decides reported size
+            result = None
         else:
             return self.module.fail_json(
                 msg=f"{self.type} is not a valid value for key type"
@@ -204,7 +209,7 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
 
         return all(
             [
-                self.size == self.original_private_key.size,
+                self.size is None or self.size == self.original_private_key.size,
                 self.type == self.original_private_key.type,
                 self._private_key_valid_backend(self.original_private_key),
             ]
@@ -324,7 +329,7 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
         public_key = self.public_key or self.original_public_key
 
         return {
-            "size": self.size,
+            "size": private_key.size if private_key else self.size,
             "type": self.type,
             "filename": self.private_key_path,
             "fingerprint": private_key.fingerprint if private_key else "",
@@ -424,7 +429,13 @@ class KeypairBackendCryptography(KeypairBackend):
 
         if self.type == "rsa1":
             self.module.fail_json(
-                msg="RSA1 keys are not supported by the cryptography backend"
+                msg="rsa1 keys are not supported by the cryptography backend"
+            )
+        if self.type == "mldsa44":
+            self.module.fail_json(
+                msg="mldsa44 keys are not supported by the cryptography backend: "
+                "the cryptography library does not support OpenSSH format for ML-DSA keys. "
+                "Use backend=opensshbin (or backend=auto with ssh-keygen installed)."
             )
 
         self.passphrase = (

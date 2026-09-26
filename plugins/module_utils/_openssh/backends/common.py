@@ -268,25 +268,15 @@ class KeygenCommand:
         self,
         *,
         private_key_path: str,
-        size: int,
+        size: int | None,
         key_type: str,
         comment: str | None,
         **kwargs: t.Unpack[_RunCommandKwarg],
     ) -> tuple[int, str, str]:
-        args = [
-            self._bin_path,
-            "-q",
-            "-N",
-            "",
-            "-b",
-            str(size),
-            "-t",
-            key_type,
-            "-f",
-            private_key_path,
-            "-C",
-            comment or "",
-        ]
+        args = [self._bin_path, "-q", "-N", ""]
+        if size is not None:
+            args.extend(["-b", str(size)])
+        args.extend(["-t", key_type, "-f", private_key_path, "-C", comment or ""])
 
         # "y" must be entered in response to the "overwrite" prompt
         data = "y" if os.path.exists(private_key_path) else None

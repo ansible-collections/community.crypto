@@ -11,7 +11,7 @@ author: "David Kainz (@lolcube)"
 short_description: Generate OpenSSH private and public keys
 description:
   - This module allows one to (re)generate OpenSSH private and public keys. It uses ssh-keygen to generate keys. One can generate
-    V(rsa), V(dsa), V(rsa1), V(ed25519) or V(ecdsa) private keys.
+    V(rsa), V(dsa), V(rsa1), V(ed25519), V(mldsa44) or V(ecdsa) private keys.
 requirements:
   - ssh-keygen (if O(backend=openssh))
   - cryptography >= 3.3 (if O(backend=cryptography))
@@ -44,7 +44,7 @@ options:
         is 4096 bits. Generally, 2048 bits is considered sufficient. DSA keys must be exactly 1024 bits as specified by FIPS
         186-2. For ECDSA keys, size determines the key length by selecting from one of three elliptic curve sizes: 256, 384
         or 521 bits. Attempting to use bit lengths other than these three values for ECDSA keys will cause this module to
-        fail. Ed25519 keys have a fixed length and the size will be ignored.'
+        fail. Ed25519 and ML-DSA-44 keys have a fixed length and the size will be ignored.'
     type: int
   type:
     description:
@@ -52,7 +52,7 @@ options:
         not be supported by every version of ssh-keygen.
     type: str
     default: rsa
-    choices: ['rsa', 'dsa', 'rsa1', 'ecdsa', 'ed25519']
+    choices: ['rsa', 'dsa', 'rsa1', 'ecdsa', 'ed25519', 'mldsa44']
   force:
     description:
       - Should the key be regenerated even if it already exists.
@@ -226,7 +226,7 @@ def main() -> t.NoReturn:
             "type": {
                 "type": "str",
                 "default": "rsa",
-                "choices": ["rsa", "dsa", "rsa1", "ecdsa", "ed25519"],
+                "choices": ["rsa", "dsa", "rsa1", "ecdsa", "ed25519", "mldsa44"],
             },
             "force": {"type": "bool", "default": False},
             "path": {"type": "path", "required": True},
