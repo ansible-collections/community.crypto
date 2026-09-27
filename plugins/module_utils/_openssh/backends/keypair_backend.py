@@ -62,9 +62,7 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
             else "always"
         )
         self.state: t.Literal["present", "absent"] = self.module.params["state"]
-        self.type: t.Literal[
-            "rsa", "dsa", "rsa1", "ecdsa", "ed25519", "mldsa44"
-        ] = (
+        self.type: t.Literal["rsa", "dsa", "rsa1", "ecdsa", "ed25519", "mldsa44"] = (
             self.module.params["type"]
         )
 
