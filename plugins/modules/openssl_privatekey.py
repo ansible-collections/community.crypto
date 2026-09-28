@@ -148,6 +148,8 @@ privatekey:
   description:
     - The (current or generated) private key's content.
     - Will be Base64-encoded if the key is in raw format.
+    - B(Note) on ansible-core 2.22+, this will be registered as a secret.
+      See R(Masking secrets in Ansible output, secret_masking) for more information.
   returned: if O(state) is V(present) and O(return_content) is V(true)
   type: str
   version_added: '1.0.0'

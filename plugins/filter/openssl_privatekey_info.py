@@ -141,6 +141,8 @@ _value:
     private_data:
       description:
         - Private key data. Depends on key type.
+        - B(Note) on ansible-core 2.22+, the values (with integers converted to strings) will be registered as secrets.
+          See R(Masking secrets in Ansible output, secret_masking) for more information.
       returned: success and when O(return_private_key_data) is set to V(true)
       type: dict
 """
