@@ -1,0 +1,2 @@
+bugfixes:
+  - "openssl_privatekey_pipe - on ansible-core 2.22+, avoid deprecated function (https://github.com/ansible-collections/community.crypto/pull/1082)."
