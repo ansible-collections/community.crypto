@@ -206,7 +206,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <section id="synopsis">
 <h2><a class="toc-backref" href="#id1" role="doc-backlink">Synopsis</a><a class="headerlink" href="#synopsis" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>This module allows one to (re)generate OpenSSH private and public keys. It uses ssh-keygen to generate keys. One can generate <code class="ansible-value docutils literal notranslate"><span class="pre">rsa</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">dsa</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">rsa1</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">ed25519</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">ecdsa</span></code> private keys.</p></li>
+<li><p>This module allows one to (re)generate OpenSSH private and public keys. It uses ssh-keygen to generate keys. One can generate <code class="ansible-value docutils literal notranslate"><span class="pre">rsa</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">dsa</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">rsa1</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">ed25519</span></code>, <code class="ansible-value docutils literal notranslate"><span class="pre">mldsa44</span></code> or <code class="ansible-value docutils literal notranslate"><span class="pre">ecdsa</span></code> private keys.</p></li>
 </ul>
 </section>
 <section id="requirements">
@@ -401,7 +401,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <div class="ansibleOptionAnchor" id="parameter-size"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-openssh-keypair-module-parameter-size"><strong>size</strong></p>
 <a class="ansibleOptionLink" href="#parameter-size" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
-<td><div class="ansible-option-cell"><p>Specifies the number of bits in the private key to create. For RSA keys, the minimum size is 1024 bits and the default is 4096 bits. Generally, 2048 bits is considered sufficient. DSA keys must be exactly 1024 bits as specified by FIPS 186-2. For ECDSA keys, size determines the key length by selecting from one of three elliptic curve sizes: 256, 384 or 521 bits. Attempting to use bit lengths other than these three values for ECDSA keys will cause this module to fail. Ed25519 keys have a fixed length and the size will be ignored.</p>
+<td><div class="ansible-option-cell"><p>Specifies the number of bits in the private key to create. For RSA keys, the minimum size is 1024 bits and the default is 4096 bits. Generally, 2048 bits is considered sufficient. DSA keys must be exactly 1024 bits as specified by FIPS 186-2. For ECDSA keys, size determines the key length by selecting from one of three elliptic curve sizes: 256, 384 or 521 bits. Attempting to use bit lengths other than these three values for ECDSA keys will cause this module to fail. Ed25519 and ML-DSA-44 keys have a fixed length and the size will be ignored.</p>
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
@@ -421,6 +421,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-type" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>The algorithm used to generate the SSH private key. <code class="ansible-value docutils literal notranslate"><span class="pre">rsa1</span></code> is for protocol version 1. <code class="ansible-value docutils literal notranslate"><span class="pre">rsa1</span></code> is deprecated and may not be supported by every version of ssh-keygen.</p>
+<p>Support for <code class="ansible-value docutils literal notranslate"><span class="pre">mldsa44</span></code> has been added in community.crypto 3.5.0.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">&quot;rsa&quot;</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -428,6 +429,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;rsa1&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;ecdsa&quot;</span></code></p></li>
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;ed25519&quot;</span></code></p></li>
+<li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">&quot;mldsa44&quot;</span></code></p></li>
 </ul>
 </div></td>
 </tr>
