@@ -24,5 +24,6 @@ plugins/modules/acme_inspect.py pylint:unpacking-non-sequence
 plugins/modules/get_certificate.py pylint:unknown-option-value
 plugins/modules/luks_device.py no-assert
 plugins/modules/openssl_pkcs12.py no-assert
+plugins/plugin_utils/_action_module.py pylint:unknown-option-value
 tests/ee/roles/smoke/library/smoke_ipaddress.py shebang
 tests/ee/roles/smoke/library/smoke_pyyaml.py shebang
