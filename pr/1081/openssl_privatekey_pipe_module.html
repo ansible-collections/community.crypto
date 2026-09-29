@@ -361,7 +361,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#parameter-return_current_key" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Set to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code> to return the current private key when the module did not generate a new one.</p>
-<p>Note that in case of check mode, when this option is not set to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>, the module always returns the current key (if it was provided) and Ansible will replace it by <code class="docutils literal notranslate"><span class="pre">VALUE_SPECIFIED_IN_NO_LOG_PARAMETER</span></code>.</p>
+<p>Note that in case of check mode, when this option is not set to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>, the module always returns the current key (if it was provided). On ansible-core before 2.22, ansible-core will replace it by <code class="docutils literal notranslate"><span class="pre">VALUE_SPECIFIED_IN_NO_LOG_PARAMETER</span></code>.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-default-bold docutils literal notranslate"><strong><span class="pre">false</span></strong></code> <span class="ansible-option-choices-default-mark">← (default)</span></p></li>
@@ -572,6 +572,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <td><div class="ansible-option-cell"><p>The generated private key’s content.</p>
 <p>Please note that if the result is not changed, the current private key will only be returned if the <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-pipe-module-parameter-return-current-key"><span class="std std-ref"><span class="pre">return_current_key</span></span></a></strong></code> option is set to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code>.</p>
 <p>Will be Base64-encoded if the key is in raw format.</p>
+<p><strong>Note</strong> on ansible-core 2.22+, this will be registered as a secret. See <a class="reference external" href="https://docs.ansible.com/projects/ansible/devel/playbook_guide/playbooks_secret_masking.html#secret-masking" title="(in Ansible devel)"><span class="xref std std-ref">Masking secrets in Ansible output</span></a> for more information.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> changed, or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-pipe-module-parameter-return-current-key"><span class="std std-ref"><span class="pre">return_current_key</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code></p>
 </div></td>
 </tr>

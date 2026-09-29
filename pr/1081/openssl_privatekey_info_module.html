@@ -411,6 +411,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-op
 <a class="ansibleOptionLink" href="#return-private_data" title="Permalink to this return value"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Private key data. Depends on key type.</p>
+<p><strong>Note</strong> on ansible-core 2.22+, the values (with integers converted to strings) will be registered as secrets. See <a class="reference external" href="https://docs.ansible.com/projects/ansible/devel/playbook_guide/playbooks_secret_masking.html#secret-masking" title="(in Ansible devel)"><span class="xref std std-ref">Masking secrets in Ansible output</span></a> for more information.</p>
 <p class="ansible-option-line"><strong class="ansible-option-returned-bold">Returned:</strong> success and when <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-openssl-privatekey-info-module-parameter-return-private-key-data"><span class="std std-ref"><span class="pre">return_private_key_data</span></span></a></strong></code> is set to <code class="ansible-value docutils literal notranslate"><span class="pre">true</span></code></p>
 </div></td>
 </tr>
