@@ -327,7 +327,11 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
         public_key = self.public_key or self.original_public_key
 
         return {
-            "size": private_key.size if (self.size is None and private_key is not None) else self.size,
+            "size": (
+                private_key.size
+                if (self.size is None and private_key is not None)
+                else self.size
+            ),
             "type": self.type,
             "filename": self.private_key_path,
             "fingerprint": private_key.fingerprint if private_key else "",
