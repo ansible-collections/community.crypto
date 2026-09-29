@@ -1,0 +1,2 @@
+minor_changes:
+  - openssh_keypair - add support for the ``mldsa44`` key type using ``ssh-keygen``. This is only supported for ``backend=opensshbin`` or ``backend=auto`` with ``ssh-keygen`` installed (https://github.com/ansible-collections/community.crypto/pull/1081).

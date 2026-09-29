@@ -96,7 +96,7 @@ from ansible_collections.community.crypto.plugins.module_utils._crypto.cryptogra
 if t.TYPE_CHECKING:  # pragma: no cover
     KeyFormat = t.Literal["SSH", "PKCS8", "PKCS1"]
     KeySerializationFormat = t.Literal["PEM", "DER", "SSH"]
-    KeyType = t.Literal["rsa", "dsa", "ed25519", "ecdsa"]
+    KeyType = t.Literal["rsa", "dsa", "ed25519", "ecdsa", "mldsa44"]
     PubKeyType = t.Literal[
         "rsa", "dsa", "ed25519", "ecdsa-nistp256", "ecdsa-nistp384", "ecdsa-nistp521"
     ]
