@@ -440,9 +440,6 @@ def main() -> t.NoReturn:
                     module.fail_json(
                         msg=f"tls_ctx_options must be a string or integer, got {tls_ctx_option!r}"
                     )
-                    tls_ctx_option_int = (  # type: ignore[unreachable]
-                        0  # make pylint happy; this code is actually unreachable
-                    )
 
                 try:
                     # Add the int value of the item to ctx options
