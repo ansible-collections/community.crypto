@@ -4,6 +4,29 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v3.5.0
+======
+
+Release Summary
+---------------
+
+Feature release.
+
+Minor Changes
+-------------
+
+- openssh_keypair - add support for the ``mldsa44`` key type using ``ssh-keygen``. This is only supported for ``backend=opensshbin`` or ``backend=auto`` with ``ssh-keygen`` installed (https://github.com/ansible-collections/community.crypto/pull/1081).
+- openssl_pkcs12_info - if ``return_private_key=true``, the private key's content returned is marked as sensitive on ansible-core 2.22+ (https://github.com/ansible-collections/community.crypto/pull/1076).
+- openssl_privatekey - if ``return_content=true``, the private key's content returned is marked as sensitive on ansible-core 2.22+ (https://github.com/ansible-collections/community.crypto/pull/1076).
+- openssl_privatekey_info - if ``return_private_key_data=true``, the private data returned is marked as sensitive on ansible-core 2.22+ (https://github.com/ansible-collections/community.crypto/pull/1076).
+- openssl_privatekey_info filter plugin - if ``return_private_key_data=true``, the private data returned is marked as sensitive on ansible-core 2.22+ (https://github.com/ansible-collections/community.crypto/pull/1076).
+- openssl_privatekey_pipe - if ``return_content=true``, the private key's content returned is marked as sensitive on ansible-core 2.22+ (https://github.com/ansible-collections/community.crypto/pull/1076).
+
+Bugfixes
+--------
+
+- openssl_privatekey_pipe - on ansible-core 2.22+, avoid deprecated function (https://github.com/ansible-collections/community.crypto/pull/1082).
+
 v3.4.0
 ======
 
