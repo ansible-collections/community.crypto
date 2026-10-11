@@ -64,6 +64,29 @@
   # Support for ed25519 keys was added in OpenSSH 6.5
   when: not (backend == 'opensshbin' and openssh_version is version('6.5', '<'))
 
+- name: "({{ backend }}) Generate mldsa44-ed25519 key"
+  community.crypto.openssh_keypair:
+    path: "{{ remote_tmp_dir }}/default_size_mldsa44_ed25519"
+    type: mldsa44-ed25519
+    backend: "{{ backend }}"
+  register: mldsa44_ed25519_output
+  ignore_errors: true
+  when: backend == 'opensshbin'
+
+- name: "({{ backend }}) Assert mldsa44-ed25519 key generation works"
+  ansible.builtin.assert:
+    that:
+      - mldsa44_ed25519_output is changed
+      - mldsa44_ed25519_output.type == 'mldsa44-ed25519'
+  when: backend == 'opensshbin' and mldsa44_ed25519_output is defined and mldsa44_ed25519_output is success
+
+- name: "({{ backend }}) Remove mldsa44-ed25519 key"
+  community.crypto.openssh_keypair:
+    path: "{{ remote_tmp_dir }}/default_size_mldsa44_ed25519"
+    state: absent
+    backend: "{{ backend }}"
+  when: backend == 'opensshbin' and mldsa44_ed25519_output is defined and mldsa44_ed25519_output is success
+
 - name: "({{ backend }}) Generate key - force"
   community.crypto.openssh_keypair:
     path: "{{ remote_tmp_dir }}/force"

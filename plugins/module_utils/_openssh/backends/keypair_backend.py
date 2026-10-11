@@ -62,9 +62,9 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
             else "always"
         )
         self.state: t.Literal["present", "absent"] = self.module.params["state"]
-        self.type: t.Literal["rsa", "dsa", "rsa1", "ecdsa", "ed25519", "mldsa44"] = (
-            self.module.params["type"]
-        )
+        self.type: t.Literal[
+            "rsa", "dsa", "rsa1", "ecdsa", "ed25519", "mldsa44-ed25519"
+        ] = self.module.params["type"]
 
         self.size: int | None = self._get_size(self.module.params["size"])
         self._validate_path()
@@ -100,7 +100,7 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
         elif self.type == "ed25519":
             # User input is ignored for fixed-size key types
             result = 256
-        elif self.type == "mldsa44":
+        elif self.type == "mldsa44-ed25519":
             # User input is ignored for fixed-size key types; ssh-keygen output decides reported size
             result = None
         else:
@@ -433,11 +433,13 @@ class KeypairBackendCryptography(KeypairBackend):
             self.module.fail_json(
                 msg="RSA1 keys are not supported by the cryptography backend"
             )
-        if self.type == "mldsa44":
+        if self.type == "mldsa44-ed25519":
             self.module.fail_json(
-                msg="ML-DSA-44 keys (type=mldsa44) are not supported by the cryptography backend: "
-                "the cryptography library does not support OpenSSH format for ML-DSA keys. "
-                "Use backend=opensshbin (or backend=auto with ssh-keygen installed)."
+                msg=(
+                    "Hybrid ML-DSA-44/Ed25519 keys (type=mldsa44-ed25519) are not "
+                    "supported by the cryptography backend. Use backend=opensshbin "
+                    "(or backend=auto with ssh-keygen installed)."
+                )
             )
 
         self.passphrase = (
@@ -473,6 +475,7 @@ class KeypairBackendCryptography(KeypairBackend):
 
     def _generate_keypair(self, private_key_path: str) -> None:
         assert self.type != "rsa1"
+
         keypair = OpensshKeypair.generate(
             keytype=self.type,
             size=self.size,

@@ -11,7 +11,7 @@ author: "David Kainz (@lolcube)"
 short_description: Generate OpenSSH private and public keys
 description:
   - This module allows one to (re)generate OpenSSH private and public keys. It uses ssh-keygen to generate keys. One can generate
-    V(rsa), V(dsa), V(rsa1), V(ed25519), V(mldsa44) or V(ecdsa) private keys.
+    V(rsa), V(dsa), V(rsa1), V(ed25519), V(mldsa44-ed25519) or V(ecdsa) private keys.
 requirements:
   - ssh-keygen (if O(backend=openssh))
   - cryptography >= 3.3 (if O(backend=cryptography))
@@ -50,10 +50,12 @@ options:
     description:
       - The algorithm used to generate the SSH private key. V(rsa1) is for protocol version 1. V(rsa1) is deprecated and may
         not be supported by every version of ssh-keygen.
-      - Support for V(mldsa44) has been added in community.crypto 3.5.0.
+      - The previously documented V(mldsa44) type has been replaced by V(mldsa44-ed25519).
+      - V(mldsa44-ed25519) requires C(ssh-keygen) and is only supported for O(backend=opensshbin),
+        or for O(backend=auto) when C(ssh-keygen) is installed.
     type: str
     default: rsa
-    choices: ['rsa', 'dsa', 'rsa1', 'ecdsa', 'ed25519', 'mldsa44']
+    choices: ['rsa', 'dsa', 'rsa1', 'ecdsa', 'ed25519', 'mldsa44-ed25519']
   force:
     description:
       - Should the key be regenerated even if it already exists.
@@ -227,7 +229,14 @@ def main() -> t.NoReturn:
             "type": {
                 "type": "str",
                 "default": "rsa",
-                "choices": ["rsa", "dsa", "rsa1", "ecdsa", "ed25519", "mldsa44"],
+                "choices": [
+                    "rsa",
+                    "dsa",
+                    "rsa1",
+                    "ecdsa",
+                    "ed25519",
+                    "mldsa44-ed25519",
+                ],
             },
             "force": {"type": "bool", "default": False},
             "path": {"type": "path", "required": True},
