@@ -64,7 +64,7 @@
   # Support for ed25519 keys was added in OpenSSH 6.5
   when: not (backend == 'opensshbin' and openssh_version is version('6.5', '<'))
 
-- when: backend == 'opensshbin'
+- when: backend == 'opensshbin' and openssh_version is version('10.5', '>=')
   block:
     - name: "({{ backend }}) Generate mldsa44-ed25519 key"
       community.crypto.openssh_keypair:
@@ -72,7 +72,6 @@
         type: mldsa44-ed25519
         backend: "{{ backend }}"
       register: mldsa44_ed25519_output
-      ignore_errors: true
 
     - name: "({{ backend }}) Assert mldsa44-ed25519 key generation works"
       ansible.builtin.assert:
