@@ -74,6 +74,20 @@
     backend: cryptography
     state: absent
 
+- name: Reject hybrid mldsa44-ed25519 key with cryptography backend
+  community.crypto.openssh_keypair:
+    path: '{{ remote_tmp_dir }}/mldsa44_ed25519_hybrid'
+    type: mldsa44-ed25519
+    backend: cryptography
+  register: mldsa44_ed25519_hybrid_output
+  ignore_errors: true
+
+- name: Check hybrid mldsa44-ed25519 is unsupported with cryptography backend
+  ansible.builtin.assert:
+    that:
+      - mldsa44_ed25519_hybrid_output is failed
+      - "'not supported by the cryptography backend' in mldsa44_ed25519_hybrid_output.msg"
+
 - name: Generate PEM encoded key with passphrase
   ansible.builtin.command: 'ssh-keygen -t rsa -b 1280 -f {{ remote_tmp_dir }}/pem_encoded -N {{ passphrase }} -m PEM'
 

@@ -1,0 +1,4 @@
+bugfixes:
+  - >-
+    openssh_keypair - change the value ``mldsa44`` for ``type`` to ``mldsa44-ed25519`` for OpenSSH ML-DSA-44 keys, since
+    ``mldsa44`` is not a valid ``ssh-keygen`` key type (https://github.com/ansible-collections/community.crypto/pull/1083).
