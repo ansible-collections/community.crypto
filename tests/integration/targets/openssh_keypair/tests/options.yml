@@ -78,7 +78,6 @@
         that:
           - mldsa44_ed25519_output is changed
           - mldsa44_ed25519_output.type == 'mldsa44-ed25519'
-      when: mldsa44_ed25519_output is defined and mldsa44_ed25519_output is success
 
     - name: "({{ backend }}) Remove mldsa44-ed25519 key"
       community.crypto.openssh_keypair:
