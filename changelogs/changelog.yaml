@@ -2056,3 +2056,14 @@ releases:
       - 1082-depr.yml
       - 3.5.0.yml
     release_date: '2026-10-04'
+  3.5.1:
+    changes:
+      bugfixes:
+        - openssh_keypair - change the value ``mldsa44`` for ``type`` to ``mldsa44-ed25519``
+          for OpenSSH ML-DSA-44 keys, since ``mldsa44`` is not a valid ``ssh-keygen``
+          key type (https://github.com/ansible-collections/community.crypto/pull/1083).
+      release_summary: Bugfix release.
+    fragments:
+      - 1083-openssh-keypair-mldsa44-ed25519.yml
+      - 3.5.1.yml
+    release_date: '2026-10-19'
