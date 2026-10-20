@@ -37,6 +37,10 @@ git_sign_commits = true
 git_sign_tags = true
 git_release_commit_message = "Release {version}."
 git_release_tag_message = "{version}"
+git_prepare_commit_message = "Prepare {version}."
+git_sign_other_commits = false
+git_post_release_bump = "next-minor"
+git_post_release_commit_message = "The next expected release will be {new-version}."
 
 [sessions]
 
