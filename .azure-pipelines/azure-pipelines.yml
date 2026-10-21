@@ -128,10 +128,6 @@ stages:
               test: ansible-test-integration-2.19-alpine-3.21-azp-posix-vm
             - name: Fedora 41 + extra VMs
               test: ansible-test-integration-2.19-fedora-41-azp-posix-vm
-            - name: FreeBSD 13.5 + group 1
-              test: ansible-test-integration-2.19-freebsd-13.5-azp-posix-1
-            - name: FreeBSD 13.5 + group 2
-              test: ansible-test-integration-2.19-freebsd-13.5-azp-posix-2
             - name: RHEL 10.1 + group 1
               test: ansible-test-integration-2.19-rhel-10.1-azp-posix-1
             - name: RHEL 10.1 + group 2
