@@ -38,24 +38,6 @@ def create_certificates(session: nox.Session) -> None:
     )
 
 
-@nox.session(name="update-azp-config", python=False)
-def update_azp_config(session: nox.Session) -> None:
-    command = [
-        "antsibull-nox",
-        "update-azp-config",
-        "--min-ansible-core",
-        "2.19",
-        "--extra-session",
-        '{"group": "Sanity", "title": "Extra sanity tests", "session": "extra-sanity-tests"}',
-    ]
-    if antsibull_nox.IN_CI:
-        command.extend(["--show-diff", "--fail-on-change"])
-    session.debug(" ".join(command))
-    result = run_antsibull_nox(command)
-    if result != 0:
-        session.error(f"Execution failed with status code {result}")
-
-
 # Allow to run the noxfile with `python noxfile.py`, `pipx run noxfile.py`, or similar.
 # Requires nox >= 2025.02.09
 if __name__ == "__main__":
