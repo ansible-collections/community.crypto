@@ -17,6 +17,7 @@ notes:
   - The M(community.crypto.acme_certificate) module also allows to do basic account management. When using both modules, it
     is recommended to disable account management for M(community.crypto.acme_certificate). For that, use the
     O(community.crypto.acme_certificate#module:modify_account) option of M(community.crypto.acme_certificate).
+  - foo bar!
 seealso:
   - name: Automatic Certificate Management Environment (ACME)
     description: The specification of the ACME protocol (RFC 8555).
