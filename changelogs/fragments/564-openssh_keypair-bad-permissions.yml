@@ -1,0 +1,4 @@
+minor_changes:
+  - "openssh_keypair - when the ``opensshbin`` backend cannot read an existing private key because ``ssh-keygen`` rejects its
+    permissions as too open, the error message now says so instead of claiming the key is passphrase protected or broken
+    (https://github.com/ansible-collections/community.crypto/issues/564)."
