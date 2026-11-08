@@ -1,4 +1,3 @@
-.azure-pipelines/scripts/publish-codecov.py replace-urlopen
 plugins/lookup/gpg_fingerprint.py validate-modules:invalid-documentation
 plugins/module_utils/crypto/cryptography_support.py pep8:E203
 plugins/module_utils/crypto/module_backends/certificate_info.py pep8:E203
