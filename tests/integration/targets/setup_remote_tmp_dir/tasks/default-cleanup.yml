@@ -7,3 +7,14 @@
   ansible.builtin.file:
     path: "{{ remote_tmp_dir }}"
     state: absent
+  ignore_errors: true
+  no_log: true
+  register: delete_temporary_directory
+  listen: delete temporary directory
+
+- name: delete temporary directory again
+  ansible.builtin.file:
+    path: "{{ remote_tmp_dir }}"
+    state: absent
+  when: delete_temporary_directory is failed
+  listen: delete temporary directory
