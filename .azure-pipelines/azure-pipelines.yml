@@ -212,10 +212,10 @@ stages:
               test: ansible-test-integration-devel-default-3.15-azp-generic-1
             - name: Generic + py3.15 + group 2
               test: ansible-test-integration-devel-default-3.15-azp-generic-2
-            - name: Fedora 44 + group 1
-              test: ansible-test-integration-devel-fedora44-azp-posix-1
-            - name: Fedora 44 + group 2
-              test: ansible-test-integration-devel-fedora44-azp-posix-2
+            - name: Fedora 45 + group 1
+              test: ansible-test-integration-devel-fedora45-azp-posix-1
+            - name: Fedora 45 + group 2
+              test: ansible-test-integration-devel-fedora45-azp-posix-2
             - name: OpenSuSE Tumbleweed + py3.13 + group 1
               test: ansible-test-integration-devel-opensuse-tumbleweed-3.13-azp-posix-1
             - name: OpenSuSE Tumbleweed + py3.13 + group 2
@@ -274,8 +274,6 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: Fedora 44 + extra VMs
-              test: ansible-test-integration-2.22-fedora-44-azp-posix-vm
             - name: macOS 26.3 + group 1
               test: ansible-test-integration-2.22-macos-26.3-azp-posix-1
             - name: macOS 26.3 + group 2
@@ -284,8 +282,6 @@ stages:
               test: ansible-test-integration-2.22-rhel-10.2-azp-posix-1
             - name: RHEL 10.2 + group 2
               test: ansible-test-integration-2.22-rhel-10.2-azp-posix-2
-            - name: Ubuntu 26.04 + extra VMs
-              test: ansible-test-integration-2.22-ubuntu-26.04-azp-posix-vm
 
   - stage: remote_devel
     displayName: Remote devel
@@ -298,8 +294,8 @@ stages:
           targets:
             - name: Alpine 3.24 + extra VMs
               test: ansible-test-integration-devel-alpine-3.24-azp-posix-vm
-            - name: Fedora 44 + extra VMs
-              test: ansible-test-integration-devel-fedora-44-azp-posix-vm
+            - name: Fedora 45 + extra VMs
+              test: ansible-test-integration-devel-fedora-45-azp-posix-vm
             - name: FreeBSD 14.5 + group 1
               test: ansible-test-integration-devel-freebsd-14.5-azp-posix-1
             - name: FreeBSD 14.5 + group 2
