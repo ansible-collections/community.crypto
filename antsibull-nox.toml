@@ -292,16 +292,6 @@ python_version = [ "3.13", "3.15" ]
 
 [[sessions.ansible_test_integration.groups.sessions]]
 ansible_core = "2.22"
-target = [ "azp/posix/vm/" ]
-remote = [
-    # "alpine/3.24",
-    "fedora/44",
-    "ubuntu/26.04",
-    # "ubuntu/24.04",
-]
-
-[[sessions.ansible_test_integration.groups.sessions]]
-ansible_core = "2.22"
 target = [ "azp/posix/1/", "azp/posix/2/" ]
 remote = [
     "macos/26.3",
@@ -321,7 +311,7 @@ description = "Meta session for running all ansible-test-integration-devel-* ses
 ansible_core = "devel"
 target = [ "azp/posix/1/", "azp/posix/2/" ]
 docker = [
-    "fedora44",
+    "fedora45",
     "ubuntu2604",
     "alpine324",
 ]
@@ -361,7 +351,7 @@ ansible_core = "devel"
 target = [ "azp/posix/vm/" ]
 remote = [
     "alpine/3.24",
-    "fedora/44",
+    "fedora/45",
     "ubuntu/26.04",
     "ubuntu/24.04",
 ]
