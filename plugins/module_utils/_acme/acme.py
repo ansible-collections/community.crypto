@@ -187,7 +187,11 @@ class ACMEDirectory:
         retry_count = 0
         while True:
             response, info = fetch_url(
-                self.module, url, method="HEAD", timeout=self.request_timeout
+                self.module,
+                url,
+                method="HEAD",
+                timeout=self.request_timeout,
+                ca_path=self.module.params["ca_path"],
             )
             if _decode_retry(
                 module=self.module,
@@ -488,6 +492,7 @@ class ACMEClient:
                 headers=headers,
                 method="POST",
                 timeout=self.request_timeout,
+                ca_path=self.module.params["ca_path"],
             )
             if _decode_retry(
                 module=self.module, response=resp, info=info, retry_count=failed_tries
@@ -611,6 +616,7 @@ class ACMEClient:
                     method="GET",
                     headers=headers,
                     timeout=self.request_timeout,
+                    ca_path=self.module.params["ca_path"],
                 )
                 if not _decode_retry(
                     module=self.module,
@@ -725,6 +731,7 @@ def create_default_argspec(
         argument_spec={
             "acme_directory": {"type": "str", "required": True},
             "acme_version": {"type": "int", "choices": [2], "default": 2},
+            "ca_path": {"type": "path"},
             "validate_certs": {"type": "bool", "default": True},
             "select_crypto_backend": {
                 "type": "str",
@@ -798,7 +805,9 @@ def create_backend(
         module.warn(
             "Disabling certificate validation for communications with ACME endpoint. "
             "This should only be done for testing against a local ACME server for "
-            "development purposes, but *never* for production purposes."
+            "development purposes, but *never* for production purposes. Even for "
+            "testing purposes, you should use `ca_path` instead of `validate_certs` "
+            "if possible."
         )
 
     # AnsibleModule() changes the locale, so change it back to C because we rely
