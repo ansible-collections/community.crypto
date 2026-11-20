@@ -141,6 +141,8 @@ notes:
   - In case the ssh key is broken or password protected, the module will fail. Set the O(force) option to V(true) if you want
     to regenerate the keypair.
   - In the case a custom O(mode), O(group), O(owner), or other file attribute is provided it will be applied to both key files.
+  - The V(opensshbin) backend cannot read private keys that are accessible by others, since C(ssh-keygen) refuses to load
+    them. Do not use a O(mode) that makes the private key group or world readable with that backend, or use O(backend=cryptography).
 """
 
 EXAMPLES = r"""
