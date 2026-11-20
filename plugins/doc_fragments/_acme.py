@@ -50,9 +50,15 @@ options:
     description:
       - Whether calls to the ACME directory will validate TLS certificates.
       - B(Warning:) Should B(only ever) be set to V(false) for testing purposes, for example when testing against a local
-        Pebble server.
+        Pebble server. If you are tempted to use this, prefer using O(ca_path) instead if possible. This option will eventually
+        be deprecated and removed.
     type: bool
     default: true
+  ca_path:
+    description:
+      - Path to CA certificate file (in PEM format) that is used to verify certificates for HTTPS connections.
+    type: path
+    version_added: 3.6.0
   select_crypto_backend:
     description:
       - Determines which crypto backend to use.
