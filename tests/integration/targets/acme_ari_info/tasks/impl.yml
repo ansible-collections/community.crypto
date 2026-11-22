@@ -56,4 +56,5 @@
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
     validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
+    ca_path: "{{ acme_endpoint_root_ca_certificate_filename if ansible_version.full is version('2.23', '>=') else omit }}"
   register: cert_1

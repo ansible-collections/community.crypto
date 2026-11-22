@@ -387,6 +387,7 @@
         acme_directory: "{{ acme_directory_url }}"
         acme_version: 2
         validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
+        ca_path: "{{ acme_endpoint_root_ca_certificate_filename if ansible_version.full is version('2.23', '>=') else omit }}"
         # account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
         select_crypto_backend: "{{ select_crypto_backend }}"
         certificate_path: "{{ remote_tmp_dir }}/cert.pem"
