@@ -73,6 +73,9 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
         self.original_public_key: PublicKey | None = None
         self.private_key: PrivateKey | None = None
         self.public_key: PublicKey | None = None
+        # Set by _private_key_readable() when the reason why the private key
+        # cannot be read is known (for example, bad file permissions).
+        self.private_key_read_error: str | None = None
 
     def _get_size(self, size: int | None) -> int | None:
         if self.type in ("rsa", "rsa1"):
@@ -174,8 +177,12 @@ class KeypairBackend(OpensshModule, metaclass=abc.ABCMeta):
             and self.regenerate in ("never", "fail", "partial_idempotence")
             and (self.original_private_key is None or not self._private_key_readable())
         ):
+            reason = (
+                self.private_key_read_error
+                or "The key is protected with a passphrase or broken."
+            )
             self.module.fail_json(
-                msg="Unable to read the key. The key is protected with a passphrase or broken. "
+                msg=f"Unable to read the key. {reason} "
                 + "Will not proceed. To force regeneration, call the module with `generate` "
                 + "set to `full_idempotence` or `always`, or with `force=true`."
             )
@@ -395,7 +402,7 @@ class KeypairBackendOpensshBin(KeypairBackend):
         rc, _stdout, stderr = self.ssh_keygen.get_matching_public_key(
             private_key_path=self.private_key_path, check_rc=False
         )
-        return not (
+        readable = not (
             rc == 255
             or any_in(
                 stderr,
@@ -404,6 +411,14 @@ class KeypairBackendOpensshBin(KeypairBackend):
                 "load failed",
             )
         )
+        if not readable and "bad permissions" in stderr:
+            self.private_key_read_error = (
+                "ssh-keygen refuses to load the private key because its permissions"
+                + " are too open (it must not be accessible by others)."
+                + " Restrict the file mode (for example with `mode=0600`),"
+                + " or use `backend=cryptography`."
+            )
+        return readable
 
     def _update_comment(self) -> None:
         assert self.comment is not None
