@@ -310,6 +310,14 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </div></td>
 </tr>
 <tr class="row-odd"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-ca_path"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-account-module-parameter-ca-path"><strong>ca_path</strong></p>
+<a class="ansibleOptionLink" href="#parameter-ca_path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 3.6.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Path to CA certificate file (in PEM format) that is used to verify certificates for HTTPS connections.</p>
+</div></td>
+</tr>
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-contact"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-account-module-parameter-contact"><strong>contact</strong></p>
 <a class="ansibleOptionLink" href="#parameter-contact" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">list</span> / <span class="ansible-option-elements">elements=string</span></p>
 </div></td>
@@ -320,7 +328,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">[]</span></code></p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-external_account_binding"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-account-module-parameter-external-account-binding"><strong>external_account_binding</strong></p>
 <a class="ansibleOptionLink" href="#parameter-external_account_binding" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">dictionary</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.1.0</em></p>
@@ -330,7 +338,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p>Only used when creating a new account. Can not be specified for ACME v1.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-external_account_binding/alg"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-account-module-parameter-external-account-binding-alg"><strong>alg</strong></p>
 <a class="ansibleOptionLink" href="#parameter-external_account_binding/alg" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span> / <span class="ansible-option-required">required</span></p>
 </div></td>
@@ -344,7 +352,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-external_account_binding/key"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-account-module-parameter-external-account-binding-key"><strong>key</strong></p>
 <a class="ansibleOptionLink" href="#parameter-external_account_binding/key" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span> / <span class="ansible-option-required">required</span></p>
 </div></td>
@@ -352,14 +360,14 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p>Padding (<code class="ansible-value docutils literal notranslate"><span class="pre">=</span></code> symbols at the end) can be omitted.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-indent"></div><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-external_account_binding/kid"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-account-module-parameter-external-account-binding-kid"><strong>kid</strong></p>
 <a class="ansibleOptionLink" href="#parameter-external_account_binding/kid" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span> / <span class="ansible-option-required">required</span></p>
 </div></td>
 <td><div class="ansible-option-indent-desc"></div><div class="ansible-option-cell"><p>The key identifier provided by the CA.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-new_account_key_content"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-account-module-parameter-new-account-key-content"><strong>new_account_key_content</strong></p>
 <a class="ansibleOptionLink" href="#parameter-new_account_key_content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -369,7 +377,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p>Required if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-account-module-parameter-new-account-key-src"><span class="std std-ref"><span class="pre">new_account_key_src</span></span></a></strong></code> is not used and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-account-module-parameter-state"><span class="std std-ref"><span class="pre">state</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">changed_key</span></code>.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-new_account_key_passphrase"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-account-module-parameter-new-account-key-passphrase"><strong>new_account_key_passphrase</strong></p>
 <a class="ansibleOptionLink" href="#parameter-new_account_key_passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.6.0</em></p>
@@ -378,7 +386,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p><strong>Note:</strong> this is not supported by the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> backend, only by the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-new_account_key_src"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-account-module-parameter-new-account-key-src"><strong>new_account_key_src</strong></p>
 <a class="ansibleOptionLink" href="#parameter-new_account_key_src" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
@@ -388,7 +396,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p>Required if <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-account-module-parameter-new-account-key-content"><span class="std std-ref"><span class="pre">new_account_key_content</span></span></a></strong></code> is not used and <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-account-module-parameter-state"><span class="std std-ref"><span class="pre">state</span></span></a></strong></code> is <code class="ansible-value docutils literal notranslate"><span class="pre">changed_key</span></code>.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-request_timeout"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-account-module-parameter-request-timeout"><strong>request_timeout</strong></p>
 <a class="ansibleOptionLink" href="#parameter-request_timeout" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 2.3.0</em></p>
@@ -398,7 +406,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">10</span></code></p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-select_crypto_backend"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-account-module-parameter-select-crypto-backend"><strong>select_crypto_backend</strong></p>
 <a class="ansibleOptionLink" href="#parameter-select_crypto_backend" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -414,7 +422,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-state"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-account-module-parameter-state"><strong>state</strong></p>
 <a class="ansibleOptionLink" href="#parameter-state" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span> / <span class="ansible-option-required">required</span></p>
 </div></td>
@@ -429,7 +437,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </ul>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-terms_agreed"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-account-module-parameter-terms-agreed"><strong>terms_agreed</strong></p>
 <a class="ansibleOptionLink" href="#parameter-terms_agreed" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
@@ -442,12 +450,12 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-validate_certs"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-account-module-parameter-validate-certs"><strong>validate_certs</strong></p>
 <a class="ansibleOptionLink" href="#parameter-validate_certs" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Whether calls to the ACME directory will validate TLS certificates.</p>
-<p><strong>Warning:</strong> Should <strong>only ever</strong> be set to <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code> for testing purposes, for example when testing against a local Pebble server.</p>
+<p><strong>Warning:</strong> Should <strong>only ever</strong> be set to <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code> for testing purposes, for example when testing against a local Pebble server. If you are tempted to use this, prefer using <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-account-module-parameter-ca-path"><span class="std std-ref"><span class="pre">ca_path</span></span></a></strong></code> instead if possible. This option will eventually be deprecated and removed.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">false</span></code></p></li>

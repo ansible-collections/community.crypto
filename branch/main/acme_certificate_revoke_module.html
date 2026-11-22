@@ -292,13 +292,21 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </div></td>
 </tr>
 <tr class="row-even"><td><div class="ansible-option-cell">
+<div class="ansibleOptionAnchor" id="parameter-ca_path"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-ca-path"><strong>ca_path</strong></p>
+<a class="ansibleOptionLink" href="#parameter-ca_path" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
+<p><em class="ansible-option-versionadded">added in community.crypto 3.6.0</em></p>
+</div></td>
+<td><div class="ansible-option-cell"><p>Path to CA certificate file (in PEM format) that is used to verify certificates for HTTPS connections.</p>
+</div></td>
+</tr>
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-certificate"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-certificate"><strong>certificate</strong></p>
 <a class="ansibleOptionLink" href="#parameter-certificate" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span> / <span class="ansible-option-required">required</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Path to the certificate to revoke.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-private_key_content"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-private-key-content"><strong>private_key_content</strong></p>
 <a class="ansibleOptionLink" href="#parameter-private_key_content" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -308,7 +316,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p>In case <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> is used, the content is not written into a temporary file. It can still happen that it is written to disk by Ansible in the process of moving the module with its argument to the node where it is executed.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-private_key_passphrase"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-private-key-passphrase"><strong>private_key_passphrase</strong></p>
 <a class="ansibleOptionLink" href="#parameter-private_key_passphrase" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 1.6.0</em></p>
@@ -317,7 +325,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p><strong>Note:</strong> this is not supported by the <code class="docutils literal notranslate"><span class="pre">openssl</span></code> backend, only by the <code class="docutils literal notranslate"><span class="pre">cryptography</span></code> backend.</p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-private_key_src"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-private-key-src"><strong>private_key_src</strong></p>
 <a class="ansibleOptionLink" href="#parameter-private_key_src" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">path</span></p>
 </div></td>
@@ -325,7 +333,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p>Note that exactly one of <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-account-key-src"><span class="std std-ref"><span class="pre">account_key_src</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-account-key-content"><span class="std std-ref"><span class="pre">account_key_content</span></span></a></strong></code>, <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-private-key-src"><span class="std std-ref"><span class="pre">private_key_src</span></span></a></strong></code>, or <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-private-key-content"><span class="std std-ref"><span class="pre">private_key_content</span></span></a></strong></code> must be specified.</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-request_timeout"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-request-timeout"><strong>request_timeout</strong></p>
 <a class="ansibleOptionLink" href="#parameter-request_timeout" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 <p><em class="ansible-option-versionadded">added in community.crypto 2.3.0</em></p>
@@ -335,7 +343,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p class="ansible-option-line"><strong class="ansible-option-default-bold">Default:</strong> <code class="ansible-option-default docutils literal notranslate"><span class="pre">10</span></code></p>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-revoke_reason"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-revoke-reason"><strong>revoke_reason</strong></p>
 <a class="ansibleOptionLink" href="#parameter-revoke_reason" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">integer</span></p>
 </div></td>
@@ -343,7 +351,7 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 <p>Possible values are <code class="ansible-value docutils literal notranslate"><span class="pre">0</span></code> (unspecified), <code class="ansible-value docutils literal notranslate"><span class="pre">1</span></code> (keyCompromise), <code class="ansible-value docutils literal notranslate"><span class="pre">2</span></code> (cACompromise), <code class="ansible-value docutils literal notranslate"><span class="pre">3</span></code> (affiliationChanged), <code class="ansible-value docutils literal notranslate"><span class="pre">4</span></code> (superseded), <code class="ansible-value docutils literal notranslate"><span class="pre">5</span></code> (cessationOfOperation), <code class="ansible-value docutils literal notranslate"><span class="pre">6</span></code> (certificateHold), <code class="ansible-value docutils literal notranslate"><span class="pre">8</span></code> (removeFromCRL), <code class="ansible-value docutils literal notranslate"><span class="pre">9</span></code> (privilegeWithdrawn), <code class="ansible-value docutils literal notranslate"><span class="pre">10</span></code> (aACompromise).</p>
 </div></td>
 </tr>
-<tr class="row-even"><td><div class="ansible-option-cell">
+<tr class="row-odd"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-select_crypto_backend"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-select-crypto-backend"><strong>select_crypto_backend</strong></p>
 <a class="ansibleOptionLink" href="#parameter-select_crypto_backend" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">string</span></p>
 </div></td>
@@ -359,12 +367,12 @@ see <a class="reference internal" href="#ansible-collections-community-crypto-ac
 </ul>
 </div></td>
 </tr>
-<tr class="row-odd"><td><div class="ansible-option-cell">
+<tr class="row-even"><td><div class="ansible-option-cell">
 <div class="ansibleOptionAnchor" id="parameter-validate_certs"></div><p class="ansible-option-title" id="ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-validate-certs"><strong>validate_certs</strong></p>
 <a class="ansibleOptionLink" href="#parameter-validate_certs" title="Permalink to this option"></a><p class="ansible-option-type-line"><span class="ansible-option-type">boolean</span></p>
 </div></td>
 <td><div class="ansible-option-cell"><p>Whether calls to the ACME directory will validate TLS certificates.</p>
-<p><strong>Warning:</strong> Should <strong>only ever</strong> be set to <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code> for testing purposes, for example when testing against a local Pebble server.</p>
+<p><strong>Warning:</strong> Should <strong>only ever</strong> be set to <code class="ansible-value docutils literal notranslate"><span class="pre">false</span></code> for testing purposes, for example when testing against a local Pebble server. If you are tempted to use this, prefer using <code class="ansible-option docutils literal notranslate"><strong><a class="reference internal" href="#ansible-collections-community-crypto-acme-certificate-revoke-module-parameter-ca-path"><span class="std std-ref"><span class="pre">ca_path</span></span></a></strong></code> instead if possible. This option will eventually be deprecated and removed.</p>
 <p class="ansible-option-line"><strong class="ansible-option-choices">Choices:</strong></p>
 <ul class="simple">
 <li><p><code class="ansible-option-choices-entry docutils literal notranslate"><span class="pre">false</span></code></p></li>
