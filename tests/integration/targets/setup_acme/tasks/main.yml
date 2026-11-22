@@ -25,3 +25,10 @@
       ACME server supports profiles: {{ acme_supports_profiles }}
       OpenSSL version is {{ openssl_version }}
       cryptography version is {{ cryptography_version }}
+
+- name: Write CA certificate's root certificate
+  ansible.builtin.copy:
+    content: "{{ acme_endpoint_root_ca_certificate_content }}"
+    dest: "{{ acme_endpoint_root_ca_certificate_filename }}"
+    mode: "0600"
+  when: ansible_version.full is version('2.23', '>=')

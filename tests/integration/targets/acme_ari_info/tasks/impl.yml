@@ -55,5 +55,6 @@
     certificate_path: "{{ remote_tmp_dir }}/cert-1.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
+    ca_path: "{{ acme_endpoint_root_ca_certificate_filename if ansible_version.full is version('2.23', '>=') else omit }}"
   register: cert_1

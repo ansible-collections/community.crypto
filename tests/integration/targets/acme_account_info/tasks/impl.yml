@@ -29,7 +29,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
   register: account_not_created
 
 - name: Create it now
@@ -38,7 +38,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: present
     allow_creation: true
     terms_agreed: true
@@ -51,7 +51,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
   register: account_created
 
 - name: Read account key
@@ -65,7 +65,7 @@
     account_key_content: "{{ slurp.content | b64decode }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: present
     allow_creation: false
     contact: []
@@ -76,7 +76,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_uri: "{{ account_created.account_uri }}"
   register: account_modified
 
@@ -86,7 +86,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_uri: "{{ account_created.account_uri }}test1234doesnotexists"
   register: account_not_exist
 
@@ -96,7 +96,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_uri: "{{ account_created.account_uri }}"
   ignore_errors: true
   register: account_wrong_key

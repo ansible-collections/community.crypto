@@ -35,7 +35,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: present
     allow_creation: false
   ignore_errors: true
@@ -47,7 +47,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: present
     allow_creation: true
     terms_agreed: true
@@ -63,7 +63,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: present
     allow_creation: true
     terms_agreed: true
@@ -77,7 +77,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: present
     allow_creation: true
     terms_agreed: true
@@ -96,7 +96,7 @@
     account_key_content: "{{ slurp.content | b64decode }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: present
     # allow_creation: false
     contact:
@@ -111,7 +111,7 @@
     account_key_content: "{{ slurp.content | b64decode }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: present
     # allow_creation: false
     contact:
@@ -125,7 +125,7 @@
     account_uri: "{{ account_created.account_uri }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: present
     # allow_creation: false
     contact:
@@ -139,7 +139,7 @@
     account_uri: "{{ account_created.account_uri ~ '12345thisdoesnotexist' }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: present
     contact: []
   ignore_errors: true
@@ -151,7 +151,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: present
     # allow_creation: false
     contact: []
@@ -165,7 +165,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: present
     # allow_creation: false
     contact: []
@@ -177,7 +177,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: present
     # allow_creation: false
     contact: []
@@ -189,7 +189,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     new_account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     new_account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     state: changed_key
@@ -205,7 +205,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     new_account_key_src: "{{ remote_tmp_dir }}/accountkey2.pem"
     new_account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     state: changed_key
@@ -220,7 +220,7 @@
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: absent
   check_mode: true
   diff: true
@@ -233,7 +233,7 @@
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: absent
   register: account_deactivate
 
@@ -244,7 +244,7 @@
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: absent
   register: account_deactivate_idempotent
 
@@ -255,7 +255,7 @@
     account_key_passphrase: "{{ 'hunter2' if select_crypto_backend != 'openssl' else omit }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: present
     allow_creation: false
   ignore_errors: true
@@ -267,7 +267,7 @@
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: present
     allow_creation: false
   ignore_errors: true
@@ -279,7 +279,7 @@
     account_key_src: "{{ remote_tmp_dir }}/{{ item.account }}.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     state: present
     allow_creation: true
     terms_agreed: true
