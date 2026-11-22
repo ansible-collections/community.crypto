@@ -23,7 +23,7 @@
   community.crypto.acme_account:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
     terms_agreed: true
@@ -50,7 +50,7 @@
   community.crypto.acme_certificate_order_create:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
     csr: "{{ remote_tmp_dir }}/cert.csr"
@@ -102,7 +102,7 @@
   community.crypto.acme_certificate_order_info:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
     order_uri: "{{ order_1.order_uri }}"
@@ -159,7 +159,7 @@
   community.crypto.acme_certificate_order_validate:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
     order_uri: "{{ order_1.order_uri }}"
@@ -176,7 +176,7 @@
   community.crypto.acme_certificate_order_info:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
     order_uri: "{{ order_1.order_uri }}"
@@ -222,7 +222,7 @@
   community.crypto.acme_certificate_order_validate:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
     order_uri: "{{ order_1.order_uri }}"
@@ -239,7 +239,7 @@
   community.crypto.acme_certificate_order_finalize:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
     order_uri: "{{ order_1.order_uri }}"
@@ -282,7 +282,7 @@
   community.crypto.acme_certificate_order_info:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
     order_uri: "{{ order_1.order_uri }}"
@@ -318,7 +318,7 @@
   community.crypto.acme_certificate_order_finalize:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
     order_uri: "{{ order_1.order_uri }}"
@@ -346,7 +346,7 @@
   community.crypto.acme_certificate_order_info:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
     select_crypto_backend: "{{ select_crypto_backend }}"
     order_uri: "{{ order_1.order_uri }}"
@@ -386,7 +386,7 @@
       community.crypto.acme_certificate_renewal_info:
         acme_directory: "{{ acme_directory_url }}"
         acme_version: 2
-        validate_certs: false
+        validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
         # account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
         select_crypto_backend: "{{ select_crypto_backend }}"
         certificate_path: "{{ remote_tmp_dir }}/cert.pem"
@@ -403,7 +403,7 @@
       community.crypto.acme_certificate_order_create:
         acme_directory: "{{ acme_directory_url }}"
         acme_version: 2
-        validate_certs: false
+        validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
         account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
         select_crypto_backend: "{{ select_crypto_backend }}"
         csr: "{{ remote_tmp_dir }}/cert.csr"
@@ -416,7 +416,7 @@
       community.crypto.acme_certificate_order_info:
         acme_directory: "{{ acme_directory_url }}"
         acme_version: 2
-        validate_certs: false
+        validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
         account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
         select_crypto_backend: "{{ select_crypto_backend }}"
         order_uri: "{{ replacement_order_1.order_uri }}"
@@ -483,7 +483,7 @@
           community.crypto.acme_certificate_order_create:
             acme_directory: "{{ acme_directory_url }}"
             acme_version: 2
-            validate_certs: false
+            validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
             account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
             select_crypto_backend: "{{ select_crypto_backend }}"
             csr: "{{ remote_tmp_dir }}/cert.csr"
@@ -507,7 +507,7 @@
           community.crypto.acme_certificate_order_create:
             acme_directory: "{{ acme_directory_url }}"
             acme_version: 2
-            validate_certs: false
+            validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
             account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
             select_crypto_backend: "{{ select_crypto_backend }}"
             csr: "{{ remote_tmp_dir }}/cert.csr"
@@ -519,7 +519,7 @@
           community.crypto.acme_certificate_order_info:
             acme_directory: "{{ acme_directory_url }}"
             acme_version: 2
-            validate_certs: false
+            validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
             account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
             select_crypto_backend: "{{ select_crypto_backend }}"
             order_uri: "{{ replacement_order_3.order_uri }}"
@@ -584,7 +584,7 @@
           community.crypto.acme_certificate_deactivate_authz:
             acme_directory: "{{ acme_directory_url }}"
             acme_version: 2
-            validate_certs: false
+            validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
             account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
             select_crypto_backend: "{{ select_crypto_backend }}"
             order_uri: "{{ replacement_order_3.order_uri }}"
@@ -606,7 +606,7 @@
       community.crypto.acme_certificate_order_validate:
         acme_directory: "{{ acme_directory_url }}"
         acme_version: 2
-        validate_certs: false
+        validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
         account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
         select_crypto_backend: "{{ select_crypto_backend }}"
         order_uri: "{{ replacement_order_1.order_uri }}"
@@ -616,7 +616,7 @@
       community.crypto.acme_certificate_order_finalize:
         acme_directory: "{{ acme_directory_url }}"
         acme_version: 2
-        validate_certs: false
+        validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
         account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
         select_crypto_backend: "{{ select_crypto_backend }}"
         order_uri: "{{ replacement_order_1.order_uri }}"
@@ -634,7 +634,7 @@
           community.crypto.acme_certificate_order_create:
             acme_directory: "{{ acme_directory_url }}"
             acme_version: 2
-            validate_certs: false
+            validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
             account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
             select_crypto_backend: "{{ select_crypto_backend }}"
             csr: "{{ remote_tmp_dir }}/cert.csr"
@@ -657,7 +657,7 @@
           community.crypto.acme_certificate_order_create:
             acme_directory: "{{ acme_directory_url }}"
             acme_version: 2
-            validate_certs: false
+            validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
             account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
             select_crypto_backend: "{{ select_crypto_backend }}"
             csr: "{{ remote_tmp_dir }}/cert.csr"
@@ -687,7 +687,7 @@
               community.crypto.acme_certificate_order_info:
                 acme_directory: "{{ acme_directory_url }}"
                 acme_version: 2
-                validate_certs: false
+                validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
                 account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
                 select_crypto_backend: "{{ select_crypto_backend }}"
                 order_uri: "{{ replacement_order_5.order_uri }}"
@@ -770,7 +770,7 @@
               community.crypto.acme_certificate_deactivate_authz:
                 acme_directory: "{{ acme_directory_url }}"
                 acme_version: 2
-                validate_certs: false
+                validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
                 account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
                 select_crypto_backend: "{{ select_crypto_backend }}"
                 order_uri: "{{ replacement_order_5.order_uri }}"
@@ -783,7 +783,7 @@
       community.crypto.acme_certificate_order_create:
         acme_directory: "{{ acme_directory_url }}"
         acme_version: 2
-        validate_certs: false
+        validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
         account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
         select_crypto_backend: "{{ select_crypto_backend }}"
         csr: "{{ remote_tmp_dir }}/cert.csr"
@@ -806,7 +806,7 @@
       community.crypto.acme_certificate_order_create:
         acme_directory: "{{ acme_directory_url }}"
         acme_version: 2
-        validate_certs: false
+        validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
         account_key_src: "{{ remote_tmp_dir }}/accountkey.pem"
         select_crypto_backend: "{{ select_crypto_backend }}"
         csr: "{{ remote_tmp_dir }}/cert.csr"

@@ -32,7 +32,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     state: absent
 - name: Read account key (EC384)
@@ -44,7 +44,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_content: "{{ slurp.content | b64decode }}"
     state: present
     allow_creation: true
@@ -57,7 +57,7 @@
     select_crypto_backend: "{{ select_crypto_backend }}"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/account-rsa.pem"
     state: present
     allow_creation: true
@@ -401,7 +401,7 @@
       community.crypto.acme_account_info:
         acme_directory: "{{ acme_directory_url }}"
         acme_version: 2
-        validate_certs: false
+        validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
         account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
         select_crypto_backend: "{{ select_crypto_backend }}"
       register: account_info
@@ -584,7 +584,7 @@
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     retrieve_orders: ignore
   register: account_orders_not
 - name: Retrieve orders as URL list (1/2)
@@ -593,7 +593,7 @@
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     retrieve_orders: url_list
   register: account_orders_urls
 - name: Retrieve orders as URL list (2/2)
@@ -602,7 +602,7 @@
     account_key_src: "{{ remote_tmp_dir }}/account-rsa.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     retrieve_orders: url_list
   register: account_orders_urls2
 - name: Retrieve orders as object list (1/2)
@@ -611,7 +611,7 @@
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     retrieve_orders: object_list
   register: account_orders_full
 - name: Retrieve orders as object list (2/2)
@@ -620,6 +620,6 @@
     account_key_src: "{{ remote_tmp_dir }}/account-rsa.pem"
     acme_version: 2
     acme_directory: "{{ acme_directory_url }}"
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     retrieve_orders: object_list
   register: account_orders_full2

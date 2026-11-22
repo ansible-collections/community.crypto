@@ -30,7 +30,7 @@
         select_crypto_backend: "{{ select_crypto_backend }}"
         acme_version: 2
         acme_directory: "{{ acme_directory_url }}"
-        validate_certs: false
+        validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
         account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
         modify_account: true
         csr: "{{ remote_tmp_dir }}/{{ certificate_name }}.csr"
@@ -45,7 +45,7 @@
   community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     account_uri: "{{ certificate_data.account_uri }}"
     url: "{{ certificate_data.order_uri }}"
@@ -59,7 +59,7 @@
   community.crypto.acme_certificate_deactivate_authz:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     account_uri: "{{ certificate_data.account_uri }}"
     order_uri: "{{ certificate_data.order_uri }}"
@@ -70,7 +70,7 @@
   community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     account_uri: "{{ certificate_data.account_uri }}"
     url: "{{ certificate_data.order_uri }}"
@@ -84,7 +84,7 @@
   community.crypto.acme_certificate_deactivate_authz:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     account_uri: "{{ certificate_data.account_uri }}"
     order_uri: "{{ certificate_data.order_uri }}"
@@ -94,7 +94,7 @@
   community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     account_uri: "{{ certificate_data.account_uri }}"
     url: "{{ certificate_data.order_uri }}"
@@ -108,7 +108,7 @@
   community.crypto.acme_certificate_deactivate_authz:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     account_uri: "{{ certificate_data.account_uri }}"
     order_uri: "{{ certificate_data.order_uri }}"
@@ -119,7 +119,7 @@
   community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     account_uri: "{{ certificate_data.account_uri }}"
     url: "{{ certificate_data.order_uri }}"
@@ -133,7 +133,7 @@
   community.crypto.acme_certificate_deactivate_authz:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     account_uri: "{{ certificate_data.account_uri }}"
     order_uri: "{{ certificate_data.order_uri }}"
@@ -143,7 +143,7 @@
   community.crypto.acme_inspect:
     acme_directory: "{{ acme_directory_url }}"
     acme_version: 2
-    validate_certs: false
+    validate_certs: "{{ ansible_version.full is version('2.23', '>=') }}"
     account_key_src: "{{ remote_tmp_dir }}/account-ec256.pem"
     account_uri: "{{ certificate_data.account_uri }}"
     url: "{{ certificate_data.order_uri }}"
