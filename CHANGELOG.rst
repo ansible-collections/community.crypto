@@ -4,6 +4,19 @@ Community Crypto Release Notes
 
 .. contents:: Topics
 
+v3.6.0
+======
+
+Release Summary
+---------------
+
+Feature release.
+
+Minor Changes
+-------------
+
+- acme_* modules - add ``ca_path`` option (https://github.com/ansible-collections/community.crypto/pull/1092).
+
 v3.5.1
 ======
 

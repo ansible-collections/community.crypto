@@ -2067,3 +2067,12 @@ releases:
       - 1083-openssh-keypair-mldsa44-ed25519.yml
       - 3.5.1.yml
     release_date: '2026-10-19'
+  3.6.0:
+    changes:
+      minor_changes:
+        - acme_* modules - add ``ca_path`` option (https://github.com/ansible-collections/community.crypto/pull/1092).
+      release_summary: Feature release.
+    fragments:
+      - 1092-acme-ca_path.yml
+      - 3.6.0.yml
+    release_date: '2026-11-22'
