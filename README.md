@@ -1,4 +1,5 @@
-# Ansible Community Crypto Collection
+ Ansible Community Crypto Collection
+
 
 [![Documentation](https://img.shields.io/badge/docs-brightgreen.svg)](https://docs.ansible.com/ansible/devel/collections/community/crypto/)
 [![Build Status](https://dev.azure.com/ansible/community.crypto/_apis/build/status/CI?branchName=main)](https://dev.azure.com/ansible/community.crypto/_build?definitionId=21)
